@@ -487,30 +487,39 @@ public class Matriks
       }
   }
   public void solveInterpolasi()
-   //I.S. Isi terdefinisi dan dalam bentuk row echelon
-   //F.S. Terbentuk persamaan interpolasi dari matriks row echelon
- {
-     int n = (bar < kol) ? bar : kol;
-     if(Isi[0][kol-1]!=0){
-         persI=persI + String.format("%.2f", Isi[0][kol-1]) + "X^" + (n-1);
-     }
-     for (int i = 1; i < n; i++) {
-         if((n-1-i)==0){
-           if (Isi[i][kol-1] != 0)
-           {
-             persI=persI + "+" + String.format("%.2f", Isi[i][kol-1]); }
-         }
-         else {
-           if (Isi[i][kol-1] != 0)
-           {
-             persI = persI + "+" + String.format("%.2f", Isi[i][kol - 1]) + "X^" + (n - 1 - i); }
-         }
-     }
-     persI=persI + "= f(X)\n";
-     for (int i =0; i<n; i++){
-         this.hasil=this.hasil+((Math.round((Isi[i][kol-1])*100)/100)*(x^(n-1-i)));
-     }
- }
+    //prekondisi pemanggilan : matriks harus memiliki solusi dan non-parametrik
+    //I.S. Isi terdefinisi dan dalam bentuk row echelon
+    //F.S. Terbentuk persamaan interpolasi dari matriks row echelon
+  {
+        boolean first = true;
+        this.hasil = 0;
+        tulism();
+        int n = (bar < kol) ? bar : kol;
+        persI = "f(X) = ";
+        for (int i = 0 ; i < this.bar ; i++)
+        {
+          if (Isi[i][this.kol-1] != 0)
+          {
+            if (i == 0 || first == true)
+            {
+              if (i == 0){
+                persI = persI + String.format("(%.2f)", Isi[i][this.kol-1]);
+              }
+              else
+              {
+                persI = persI + String.format("(%.2f)X^" + (i), Isi[i][this.kol-1]);
+              }
+              first = false;
+            }
+            else
+            {
+              persI = persI + String.format(" + (%.2f)X^" + (i), Isi[i][this.kol-1]);
+            }
+            this.hasil = this.hasil + (Math.pow(3 , i)*Isi[i][this.kol-1]);
+          }
+        }
+        System.out.println(this.hasil);
+  }
   public void bacafile()
   //Membaca file yang berisi matriks dan mengisikan ke bentuk matriks
   {
@@ -590,7 +599,7 @@ public class Matriks
           // interpolasi
           solveInterpolasi();
           printWriter.print(persI);
-          printWriter.println("f("+ x + ") = "+this.hasil);
+          printWriter.printf("f(%d) = %.2f",x,this.hasil);
           System.out.printf("Hasil Tersimpan! pada file %s\n", namafile);
         }
         printWriter.close();
